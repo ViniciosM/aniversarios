@@ -3,11 +3,11 @@ import { baseUrlNormalized } from './lib/base-url-normalized'
 import { auth } from "@/lib/auth"
 
 export default auth((req: NextRequest) => {
-    const isDebug = true;
+    const isDebug = false;
     const token = req.cookies.get('authjs.session-token')
     const pathname = req.nextUrl.pathname
 
-    if ((pathname === '/auth/login' || pathname === '/auth/sing-up') && (token || isDebug)) {
+    if ((pathname === '/auth/login' || pathname === '/auth/sign-up') && (token || isDebug)) {
         console.log("redirecting to app");
         return NextResponse.redirect(new URL(baseUrlNormalized('/app')))
     }
