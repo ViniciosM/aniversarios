@@ -33,7 +33,7 @@ export default function BirthDayCard({ name = "Maria Silva", brithDayDate = new 
       <CardHeader className="text-center">
         <CardTitle className="text-2xl font-bold text-primary">{name}</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-2">
         <div className="flex items-center justify-center space-x-2 text-muted-foreground">
           <Calendar className="h-5 w-5" />
           <span className="text-lg">{new Date(brithDayDate).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' })}</span>

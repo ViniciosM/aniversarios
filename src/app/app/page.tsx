@@ -3,10 +3,11 @@
 import { User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
-import {  useState } from "react"
+import {  useEffect, useMemo, useState } from "react"
 import { AppSidebar } from "@/components/app-sidebar"
 import { SidebarProvider } from "@/components/ui/sidebar"
 import BirthDayCard from "@/components/birthday-card"
+import CircularProgressIndicator from "@/components/circular-progress-indicator"
 
 interface Birthday {
   id: number,
@@ -16,32 +17,36 @@ interface Birthday {
 
 export default function BirthDayListPage() {
   const [filter, setFilter] = useState<"all" | "thisMonth">("all")
+  const [birthdays, setBirthdays] = useState<Birthday[]>([])
+  const [isLoading, setIsLoading] = useState(true)
 
-  const birthdays: Birthday[] = [
-    { id: 1, name: "Carol", date: new Date("1999-11-05") },
-    { id: 2, name: "Jorge", date: new Date() },
-    { id: 3, name: "Maria", date: new Date() },
-    { id: 4, name: "Joana", date: new Date() },
-    { id: 5, name: "Vinicios", date: new Date() },
-    { id: 6, name: "Flavio", date: new Date() }
-  ];
+    useEffect(() => {
+    setTimeout(() => {
+      const fetchedBirthdays: Birthday[] = [
+        { id: 1, name: "Carol", date: new Date("1999-10-03") },
+        { id: 2, name: "Jorge", date: new Date() },
+        { id: 3, name: "Maria", date: new Date() },
+        { id: 4, name: "Joana", date: new Date() },
+        { id: 5, name: "Vinicios", date: new Date() },
+        { id: 6, name: "Flavio", date: new Date() }
+      ]
+      setBirthdays(fetchedBirthdays)
+      setIsLoading(false) 
+    }, 1) 
+  }, [])
 
-  const filterBirthdays = (filter: "all" | "thisMonth") => {
-    console.log("chamando");
-    const currentMonth = new Date().getMonth();
-    const currentYear = new Date().getFullYear();
 
+
+  const filteredBirthdays = useMemo(() => {
+    const currentMonth = new Date().getMonth()
     if (filter === "thisMonth") {
       return birthdays.filter(birthday => {
-        const birthdayMonth = birthday.date.getMonth();
-        const birthdayYear = birthday.date.getFullYear();
-        return birthdayMonth === currentMonth && birthdayYear === currentYear;
-      });
+        const birthdayMonth = birthday.date.getMonth()
+        return birthdayMonth === currentMonth
+      })
     }
-    return birthdays; 
-  };
-
-  const filteredBirthdays = filterBirthdays(filter);
+    return birthdays
+  }, [filter, birthdays])
 
 
 
@@ -72,13 +77,16 @@ export default function BirthDayListPage() {
               Este mês
             </Button>
           </div>
+          {isLoading ? (
+            <CircularProgressIndicator  />
+          ) : (
           <div className="space-y-2">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-6 mb-4">
               {filteredBirthdays.map((birthday) => (
                 <BirthDayCard key={birthday.id} name={birthday.name} brithDayDate={birthday.date} />
               ))}
             </div>
-          </div>
+          </div>)}
         </div>
       </SidebarProvider>
     </div>
