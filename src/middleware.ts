@@ -6,15 +6,15 @@ export default auth((req: NextRequest) => {
     const isDebug = true;
     const token = req.cookies.get('authjs.session-token')
     const pathname = req.nextUrl.pathname
-
-    const isPagesValidToReditectToApp = pathname === '/auth/login' || pathname === '/auth/sign-up' || pathname === '/';
+    const isRootPath = pathname === '/';
+    const isPagesValidToReditectToApp = pathname === '/auth/login' || pathname === '/auth/sign-up' || isRootPath;
 
     if (isPagesValidToReditectToApp && (token || isDebug)) {
 
         return NextResponse.redirect(new URL(baseUrlNormalized('/app')))
     }
 
-    const isPagesValidToReditectToLogin = (pathname.includes('/app') || pathname === "/");
+    const isPagesValidToReditectToLogin = (pathname.includes('/app') || isRootPath);
     if (isPagesValidToReditectToLogin && (!token && !isDebug)) {
         return NextResponse.redirect(new URL(baseUrlNormalized('/auth/login')))
     }
