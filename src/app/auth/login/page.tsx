@@ -1,14 +1,14 @@
-import { Metadata } from "next"
-import Link from "next/link"
+import { Metadata } from "next";
+import Link from "next/link";
 
-import { cn } from "@/lib/utils"
-import { UserAuthForm } from "./components/user-auth-form"
-import { buttonVariants } from "@/components/ui/button"
+import { cn } from "@/lib/utils";
+import { UserAuthForm } from "./components/user-auth-form";
+import { buttonVariants } from "@/components/ui/button";
 
 export const metadata: Metadata = {
   title: "Autenticação",
   description: "Formulários de autenticação construídos usando os componentes.",
-}
+};
 
 export default function AuthenticationPage() {
   return (
@@ -43,9 +43,9 @@ export default function AuthenticationPage() {
           <div className="relative z-20 mt-auto">
             <blockquote className="space-y-2">
               <p className="text-lg">
-                &ldquo;Esta biblioteca me salvou inúmeras horas de trabalho e
-                me ajudou a entregar designs impressionantes aos meus clientes
-                mais rapidamente do que nunca.&rdquo;
+                &ldquo;Esta biblioteca me salvou inúmeras horas de trabalho e me
+                ajudou a entregar designs impressionantes aos meus clientes mais
+                rapidamente do que nunca.&rdquo;
               </p>
               <footer className="text-sm">Sofia Davis</footer>
             </blockquote>
@@ -83,5 +83,5 @@ export default function AuthenticationPage() {
         </div>
       </div>
     </>
-  )
+  );
 }
