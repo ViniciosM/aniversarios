@@ -1,26 +1,26 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 
-import { cn } from "@/lib/utils"
-import { Label } from "@/components/ui/label"
-import { Button } from "@/components/ui/button"
-import { Icons } from "@/components/ui/icons"
-import { Input } from "@/components/ui/input"
+import { cn } from "@/lib/utils";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Icons } from "@/components/ui/icons";
+import { Input } from "@/components/ui/input";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
-  const [isLoading, setIsLoading] = React.useState<boolean>(false)
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
   async function onSubmit(event: React.SyntheticEvent) {
-    event.preventDefault()
-    setIsLoading(true)
+    event.preventDefault();
+    setIsLoading(true);
 
     setTimeout(() => {
-      setIsLoading(false)
-    }, 3000)
+      setIsLoading(false);
+    }, 3000);
   }
 
   return (
@@ -68,5 +68,5 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
         Google
       </Button>
     </div>
-  )
+  );
 }

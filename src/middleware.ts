@@ -7,13 +7,15 @@ export default auth((req: NextRequest) => {
     const token = req.cookies.get('authjs.session-token')
     const pathname = req.nextUrl.pathname
 
-    if ((pathname === '/auth/login' || pathname === '/auth/sign-up') && (token || isDebug)) {
-        console.log("redirecting to app");
+    const isAuthenticationPage = pathname === '/auth/login' || pathname === '/auth/sign-up';
+
+    if (isAuthenticationPage && (token || isDebug)) {
+
         return NextResponse.redirect(new URL(baseUrlNormalized('/app')))
     }
 
-    if (pathname.includes('/app') && (!token && !isDebug)) {
-        console.log("redirecting to login");
+    const isAppPage = (pathname.includes('/app') || pathname === "/");
+    if (isAppPage && (!token && !isDebug)) {
         return NextResponse.redirect(new URL(baseUrlNormalized('/auth/login')))
     }
 })

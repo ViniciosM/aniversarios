@@ -1,7 +1,5 @@
-'use client'
+"use client";
 
 export default function Page() {
-  return (
-    <div className="flex h-screen bg-background"></div>
-  )
+  return <div className="flex h-screen bg-background"></div>;
 }
