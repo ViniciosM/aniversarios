@@ -3,19 +3,19 @@ import { baseUrlNormalized } from './lib/base-url-normalized'
 import { auth } from "@/lib/auth"
 
 export default auth((req: NextRequest) => {
-    const isDebug = false;
+    const isDebug = true;
     const token = req.cookies.get('authjs.session-token')
     const pathname = req.nextUrl.pathname
 
-    const isAuthenticationPage = pathname === '/auth/login' || pathname === '/auth/sign-up';
+    const isPagesValidToReditectToApp = pathname === '/auth/login' || pathname === '/auth/sign-up' || pathname === '/';
 
-    if (isAuthenticationPage && (token || isDebug)) {
+    if (isPagesValidToReditectToApp && (token || isDebug)) {
 
         return NextResponse.redirect(new URL(baseUrlNormalized('/app')))
     }
 
-    const isAppPage = (pathname.includes('/app') || pathname === "/");
-    if (isAppPage && (!token && !isDebug)) {
+    const isPagesValidToReditectToLogin = (pathname.includes('/app') || pathname === "/");
+    if (isPagesValidToReditectToLogin && (!token && !isDebug)) {
         return NextResponse.redirect(new URL(baseUrlNormalized('/auth/login')))
     }
 })
