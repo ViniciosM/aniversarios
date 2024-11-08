@@ -1,8 +1,7 @@
 "use client";
 
-import { type LucideIcon } from "lucide-react";
-
 import {} from "@/components/ui/collapsible";
+import BirthdayDetailsForm from "../app/app/components/birthday-details-form";
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -10,28 +9,45 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { Gift, Home, Plus } from "lucide-react";
+import { useBirthdayContext } from "@/app/app/contexts/birthday-page-context";
 
-export function NavMain({
-  items,
-}: {
-  items: {
-    title: string;
-    url: string;
-    icon?: LucideIcon;
-    isActive?: boolean;
-  }[];
-}) {
+export function NavMain() {
+  const { addBirthday } = useBirthdayContext();
   return (
     <SidebarGroup>
       <SidebarGroupContent>
         <SidebarMenu>
-          {items.map((item) => (
-            <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton asChild isActive={item.isActive}>
-                <a href={item.url}>{item.title}</a>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild isActive={true}>
+              <a href="#">
+                <Home className="mr-2 h-4 w-4" />
+                Início
+              </a>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <BirthdayDetailsForm
+              onBirthdayDataCreated={(data) => addBirthday(data)}
+            >
+              <SidebarMenuButton asChild>
+                <a href="#">
+                  {" "}
+                  <Plus className="mr-2 h-4 w-4" />
+                  Novo Aniversário
+                </a>
               </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
+            </BirthdayDetailsForm>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild>
+              <a href="#">
+                {" "}
+                <Gift className="mr-2 h-4 w-4" />
+                Recomendar Presentes
+              </a>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>
