@@ -4,10 +4,11 @@ export interface RecommendadedGifts {
     description: string;
 }
 export interface Birthday {
-    id?: number;
+    id: number;
     name: string;
     date: Date;
     relationship: string;
     observation?: string;
+    daysToBirthday: number;
     recommendadedGifts?: RecommendadedGifts;
 }

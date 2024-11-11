@@ -1,39 +1,108 @@
-import { Birthday } from "@/app/domain/entities";
+import { Birthday } from './../../domain/entities';
 import { AppServerError } from "@/app/domain/erros";
+import { supabase } from "@/lib/supabase";
+import { calculateDaysUntilBirthday, todayDate } from '@/lib/utils';
+import { parseISO } from "date-fns";
+
+export type UpdateBirthdayData = {
+    id: number;
+    name?: string;
+    date?: string;
+    relationship?: string;
+    observation?: string;
+};
+
+export type CreateBirthdayData = {
+    name: string,
+    date: string,
+    relationship: string,
+    observation?: string,
+    user_id: string,
+}
 
 export abstract class BirthdayService {
-    static async fetchBirthdays(): Promise<Birthday[] | AppServerError> {
+    static async fetchBirthdays(userId: string): Promise<Birthday[] | AppServerError> {
         try {
-            await new Promise((resolve) => setTimeout(resolve, 1000));
-            const fetchedBirthdays: Birthday[] = [
-                { id: 1, name: "Carol", date: new Date("1999-10-03"), relationship: "Parente", observation: "Muito carismática" },
-                { id: 2, name: "Jorge", date: new Date(), relationship: "Parente" },
-                { id: 3, name: "Maria", date: new Date(), relationship: "Parente" },
-                { id: 4, name: "Joana", date: new Date(), relationship: "Parente" },
-                { id: 5, name: "Vinicios", date: new Date(), relationship: "Parente" },
-                { id: 6, name: "Flavio", date: new Date(), relationship: "Parente" },
-            ];
-            return fetchedBirthdays;
+            const { data, error } = await supabase
+                .from('birthdays')
+                .select(`
+                        id,
+                        name,
+                        date,
+                        relationship,
+                        observation,
+                        recommended_gifts ( 
+                            id, 
+                            name, 
+                            description 
+                        )
+                `)
+                .eq('user_id', userId)
+                .order('date', { ascending: true });
+
+            if (error) {
+                return new AppServerError(error.message, 400);
+            }
+
+            const today = todayDate();
+            
+            const parsedBirthdays = (data).map(birthday => {
+                birthday.date = parseISO(birthday.date as string);
+                const daysToBirthday = calculateDaysUntilBirthday( birthday.date, today)
+                return { ...birthday, daysToBirthday};
+            });
+            return parsedBirthdays;
         } catch (err) {
             return new AppServerError("Failed to fetch birthdays", 400);
         }
     }
 
-    static async create(birthday: Birthday): Promise<Birthday | AppServerError> {
+    static async create(birthday: CreateBirthdayData): Promise<Birthday | AppServerError> {
         try {
-            throw Error()
-            await new Promise((resolve) => setTimeout(resolve, 1000));
-            return birthday;
+            const { data, error } = await supabase
+                .from('birthdays')
+                .insert([
+                    birthday,
+                ])
+                .select()
+
+            if (error) {
+                return new AppServerError(error.message, 400);
+            }
+             const today = todayDate();
+
+            const parsedBirthdays = (data).map(birthday => {
+                birthday.date = parseISO(birthday.date as string);
+                const daysToBirthday = calculateDaysUntilBirthday( birthday.date, today)
+                return { ...birthday, daysToBirthday};
+            });
+
+            return parsedBirthdays.at(0)!;
         } catch (err) {
             return new AppServerError("Failed to create birthdays", 400);
         }
     }
 
-    static async update(birthday: Birthday): Promise<Birthday | AppServerError> {
+
+    static async update(birthday: UpdateBirthdayData): Promise<Birthday | AppServerError> {
         try {
-            throw Error()
-            await new Promise((resolve) => setTimeout(resolve, 1000));
-            return birthday;
+            const { data, error } = await supabase
+                .from('birthdays')
+                .update(birthday)
+                .eq('id', birthday.id)
+                .select();
+
+            if (error) {
+                return new AppServerError(error.message, 400);
+            }
+            const today = todayDate();
+            const parsedBirthdays = (data).map(birthday => {
+                birthday.date = parseISO(birthday.date as string);
+                const daysToBirthday = calculateDaysUntilBirthday( birthday.date, today)
+                return { ...birthday, daysToBirthday};
+            });
+
+            return parsedBirthdays.at(0)!;
         } catch (err) {
             return new AppServerError("Failed to update birthdays", 400);
         }
@@ -41,7 +110,15 @@ export abstract class BirthdayService {
 
     static async delete(birthdayId: number): Promise<number | AppServerError> {
         try {
-            await new Promise((resolve) => setTimeout(resolve, 1000));
+            const { error } = await supabase
+                .from('birthdays')
+                .delete()
+                .eq('id', birthdayId)
+                .select();
+
+            if (error) {
+                return new AppServerError(error.message, 400);
+            }
             return birthdayId;
         } catch (err) {
             return new AppServerError("Failed to delete birthdays", 400);

@@ -11,6 +11,10 @@ export default function BirthdayCardSkeletonLoading() {
       <Skeleton className="w-full max-w-md mx-auto h-[212px] bg-gray-200 dark:bg-gray-700 " />
       <Skeleton className="w-full max-w-md mx-auto h-[212px] bg-gray-200 dark:bg-gray-700 " />
       <Skeleton className="w-full max-w-md mx-auto h-[212px] bg-gray-200 dark:bg-gray-700 " />
+      <Skeleton className="w-full max-w-md mx-auto h-[212px] bg-gray-200 dark:bg-gray-700 " />
+      <Skeleton className="w-full max-w-md mx-auto h-[212px] bg-gray-200 dark:bg-gray-700 " />
+      <Skeleton className="w-full max-w-md mx-auto h-[212px] bg-gray-200 dark:bg-gray-700 " />
+      <Skeleton className="w-full max-w-md mx-auto h-[212px] bg-gray-200 dark:bg-gray-700 " />
     </div>
   );
 }

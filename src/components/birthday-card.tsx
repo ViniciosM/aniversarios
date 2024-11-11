@@ -1,44 +1,47 @@
-import { useState, useEffect, forwardRef } from "react";
-import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar, Gift, Clock } from "lucide-react";
-import { Slot } from "@radix-ui/react-slot";
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Calendar, Gift, Clock, Trash2 } from "lucide-react";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import { Button } from "@/components/ui/button";
+import { DeleteConfirmationDialog } from "./delete-confirmation-dialog";
 
-interface BirthDayCardProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface BirthDayCardProps {
   name: string;
-  brithDayDate: Date;
-  asChild?: boolean;
+  birthdayDate: Date;
+  daysToBirthDay: number;
+  onDelete: () => Promise<void>;
+  onClick?: (event: React.MouseEvent) => void;
 }
 
-const BirthDayCard = forwardRef<HTMLButtonElement, BirthDayCardProps>(
-  ({ name, brithDayDate, asChild, ...props }, ref) => {
-    const [daysToBirthDay, setDaysToBirthDay] = useState(0);
+export function BirthdayCard({
+  name,
+  birthdayDate,
+  onDelete,
+  onClick,
+  daysToBirthDay,
+}: BirthDayCardProps) {
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-    useEffect(() => {
-      const calcularDiasAteAniversario = () => {
-        const todayDate = new Date();
-        brithDayDate.setFullYear(todayDate.getFullYear());
-
-        if (brithDayDate < todayDate) {
-          brithDayDate.setFullYear(todayDate.getFullYear() + 1);
-        }
-
-        const difference = brithDayDate.getTime() - todayDate.getTime();
-        const days = Math.ceil(difference / (1000 * 3600 * 24));
-        setDaysToBirthDay(days);
-      };
-
-      calcularDiasAteAniversario();
-    }, [brithDayDate]);
-
-    const Component = asChild ? Slot : "button";
-
-    return (
-      <Component
-        ref={ref}
-        className="w-full max-w-md mx-auto shadow-lg hover:shadow-xl transition-shadow duration-300"
-        {...props}
+  return (
+    <div>
+      <Card
+        onClick={onClick}
+        className="cursor-pointer relative w-full max-w-md mx-auto shadow-lg hover:shadow-xl transition-shadow duration-300"
       >
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute top-2 right-2 text-muted-foreground hover:text-destructive"
+          aria-label={`Delete ${name}'s birthday`}
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsDeleteDialogOpen(true);
+          }}
+        >
+          <Trash2 className="h-5 w-5" />
+        </Button>
+
         <div>
           <CardHeader className="text-center">
             <CardTitle className="text-2xl font-bold text-primary">
@@ -49,9 +52,8 @@ const BirthDayCard = forwardRef<HTMLButtonElement, BirthDayCardProps>(
             <div className="flex items-center justify-center space-x-2 text-muted-foreground">
               <Calendar className="h-5 w-5" />
               <span className="text-lg">
-                {new Date(brithDayDate).toLocaleDateString("pt-BR", {
-                  day: "2-digit",
-                  month: "long",
+                {format(birthdayDate, "dd 'de' MMMM", {
+                  locale: ptBR,
                 })}
               </span>
             </div>
@@ -67,11 +69,13 @@ const BirthDayCard = forwardRef<HTMLButtonElement, BirthDayCardProps>(
             </div>
           </CardContent>
         </div>
-      </Component>
-    );
-  }
-);
-
-BirthDayCard.displayName = "BirthDayCard";
-
-export default BirthDayCard;
+      </Card>
+      <DeleteConfirmationDialog
+        onDelete={onDelete}
+        itemName="aniversário"
+        isOpen={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+      />
+    </div>
+  );
+}
