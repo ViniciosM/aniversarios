@@ -9,8 +9,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   ...authConfig,
   providers: [Google],
   adapter: SupabaseAdapter({
-    url: process.env.SUPABASE_URL,
-    secret: process.env.SUPABASE_SERVICE_ROLE_KEY,
+    url: process.env.SUPABASE_URL ?? '',
+    secret: process.env.SUPABASE_SERVICE_ROLE_KEY ?? '',
   }),
   callbacks: {
     async session({ session, user }) {
