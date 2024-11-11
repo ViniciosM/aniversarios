@@ -3,7 +3,7 @@ import { baseUrlNormalized } from './lib/base-url-normalized'
 import { auth } from "@/lib/auth"
 
 export default auth((req: NextRequest) => {
-    const isDebug = false;
+    const isDebug = true;
     const token = req.cookies.get('authjs.session-token')
     const pathname = req.nextUrl.pathname
     const isRootPath = pathname === '/';

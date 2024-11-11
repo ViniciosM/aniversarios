@@ -19,16 +19,20 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { CalendarIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, minimumDate, todayDate } from "@/lib/utils";
 import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Icons } from "@/components/ui/icons";
 import { toast } from "@/hooks/use-toast";
 import { Birthday } from "@/app/domain/entities";
-import { BirthdayService } from "../service/birthday-service";
+import {
+  BirthdayService,
+  UpdateBirthdayData,
+} from "../service/birthday-service";
 import { AppServerError } from "@/app/domain/erros";
 
+import { ptBR } from "date-fns/locale";
 type FormBirthdayData = {
   id?: number;
   name: string;
@@ -44,18 +48,23 @@ const schema = yup.object({
   date: yup.date().required("Data é obrigatória"),
 });
 
-export default function Component({
-  children,
-  initialData,
-  onBirthdayDataCreated,
-  onBirthdayDataUpdated,
-}: {
+interface BirthdayFormDialogProps {
   children?: React.ReactNode;
   initialData?: FormBirthdayData;
   onBirthdayDataCreated?: (data: Birthday) => void;
   onBirthdayDataUpdated?: (data: Birthday) => void;
-}) {
-  const [open, setOpen] = React.useState(false);
+  isOpen: boolean;
+  onOpenChange?: (open: boolean) => void;
+}
+
+export function BirthdayDetailsForm({
+  children,
+  initialData,
+  onBirthdayDataCreated,
+  onBirthdayDataUpdated,
+  isOpen,
+  onOpenChange,
+}: BirthdayFormDialogProps) {
   const [isCalendarOpen, setIsCalendarOpen] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
 
@@ -78,7 +87,7 @@ export default function Component({
   const onSubmit = async (data: FormBirthdayData) => {
     setIsLoading(true);
 
-    if (initialData) {
+    if (initialData !== undefined && initialData.id) {
       await changeBirthday(data);
     } else {
       await createBirthday(data);
@@ -88,7 +97,12 @@ export default function Component({
   };
 
   const changeBirthday = async (data: FormBirthdayData) => {
-    const result = await BirthdayService.update(data);
+    const updateData = await createUpdatedBirthdayData(data);
+    if (updateData === undefined) {
+      onOpenChange?.(false);
+      return;
+    }
+    const result = await BirthdayService.update(updateData);
     if (result instanceof AppServerError) {
       toast({
         variant: "destructive",
@@ -97,13 +111,42 @@ export default function Component({
         duration: 3000,
       });
     } else {
-      setOpen(false);
+      onOpenChange?.(false);
       onBirthdayDataUpdated?.(result);
     }
   };
 
+  const createUpdatedBirthdayData = async (data: FormBirthdayData) => {
+    if (data.id === undefined) return;
+    const updateData: UpdateBirthdayData = { id: data.id! };
+
+    if (data.name !== initialData?.name) {
+      updateData.name = data.name;
+    }
+
+    if (data.date.toISOString() !== initialData?.date.toISOString()) {
+      updateData.date = data.date.toISOString();
+    }
+
+    if (data.relationship !== initialData?.relationship) {
+      updateData.relationship = data.relationship;
+    }
+
+    if (data.observation !== initialData?.observation) {
+      updateData.observation = data.observation;
+    }
+
+    return updateData;
+  };
+
   const createBirthday = async (data: FormBirthdayData) => {
-    const result = await BirthdayService.create(data);
+    const result = await BirthdayService.create({
+      name: data.name,
+      relationship: data.relationship,
+      observation: data.observation,
+      date: data.date.toISOString(),
+      user_id: "efe5ffea-3c3a-4168-8853-ccac1191125d",
+    });
     if (result instanceof AppServerError) {
       toast({
         variant: "destructive",
@@ -113,22 +156,28 @@ export default function Component({
       });
       return;
     } else {
-      setOpen(false);
+      onOpenChange?.(false);
       onBirthdayDataCreated?.(result);
+      return;
     }
   };
 
-  const onOpenChange = (open: boolean) => {
-    setOpen(open);
-    if (open) {
+  const today = todayDate();
+
+  const isDateDisabled = (date: Date) => {
+    return date > today || date < minimumDate;
+  };
+
+  React.useEffect(() => {
+    if (isOpen) {
       reset(initialData);
     }
-  };
+  }, [isOpen, initialData, reset]);
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="rounded-lg w-[90%] sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>
             {initialData ? "Atualizar Aniversário" : "Novo Aniversário"}
@@ -184,6 +233,7 @@ export default function Component({
                           day: "2-digit",
                           month: "long",
                           year: "numeric",
+                          timeZone: "UTC",
                         })
                       ) : (
                         <span>Selecione uma data</span>
@@ -193,6 +243,8 @@ export default function Component({
                   <PopoverContent className="w-auto p-0" align="start">
                     <Calendar
                       mode="single"
+                      locale={ptBR}
+                      disabled={isDateDisabled}
                       selected={field.value}
                       onSelect={(newDate) => {
                         field.onChange(newDate);
@@ -246,7 +298,7 @@ export default function Component({
                   id="observation"
                   disabled={isLoading}
                   placeholder="Escreva características e gostos dessa pessoa"
-                  className="min-h-[100px]"
+                  className="min-h-[100px] text-sm"
                 />
               )}
             />

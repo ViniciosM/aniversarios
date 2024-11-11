@@ -32,15 +32,19 @@ export const BirthdayProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const addBirthday = useCallback((newBirthday: Birthday) => {
     setBirthdays((prevBirthdays) => {
-      return [...prevBirthdays, newBirthday];
+      return [...prevBirthdays, newBirthday].sort(
+        (a, b) => a.daysToBirthday - b.daysToBirthday
+      );
     });
   }, []);
 
   const updateBirthday = useCallback((newBirthday: Birthday) => {
     setBirthdays((prevBirthdays) =>
-      prevBirthdays.map((birthday) =>
-        birthday.id === newBirthday.id ? newBirthday : birthday
-      )
+      prevBirthdays
+        .map((birthday) =>
+          birthday.id === newBirthday.id ? newBirthday : birthday
+        )
+        .sort((a, b) => a.daysToBirthday - b.daysToBirthday)
     );
   }, []);
 
