@@ -28,7 +28,7 @@ function BirthDayListPageContent() {
   >();
   const [error, setError] = useState<Error | null>(null);
   const { toast } = useToast();
-  const { birthdays, updateBirthday, setBirthdays, removeBirthday } =
+  const { birthdays, updateBirthday, setBirthdaysList, removeBirthday } =
     useBirthdayContext();
 
   const loadBirthdays = useCallback(async () => {
@@ -46,10 +46,10 @@ function BirthDayListPageContent() {
         duration: 3000,
       });
     } else {
-      setBirthdays(result);
+      setBirthdaysList(result);
     }
     setIsLoading(false);
-  }, [toast, setBirthdays]);
+  }, [toast, setBirthdaysList]);
 
   const deleteBirthday = useCallback(
     async (birthdayId: number) => {

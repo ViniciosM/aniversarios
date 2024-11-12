@@ -48,8 +48,8 @@ export function DeleteConfirmationDialog({
             Você tem certeza em deletar esse(a) {itemName}?
           </AlertDialogTitle>
           <AlertDialogDescription>
-            Essa ação não pode ser desfeita. Isso irá deletar permanentemente o
-            (a){itemName} do seus dados.
+            Essa ação não pode ser desfeita. Isso irá deletar permanentemente
+            o(a) {itemName} do seus dados.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

@@ -44,15 +44,6 @@ export function NavMain() {
               </SidebarMenuButton>
             </BirthdayDetailsForm>
           </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild>
-              <a href="#">
-                {" "}
-                <Gift className="mr-2 h-4 w-4" />
-                Recomendar Presentes
-              </a>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>
