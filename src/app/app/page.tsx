@@ -97,7 +97,7 @@ function BirthDayListPageContent() {
           <div className="flex items-center gap-2">
             <SidebarTrigger className="-ml-1" />
             <Separator orientation="vertical" className="mr-2 h-4" />
-            <h1 className="text-xl font-semibold">Lista de aniversários</h1>
+            <h1 className="text-xl font-semibold">Aniversários</h1>
           </div>
           <Button variant="ghost" size="icon">
             <User className="h-6 w-6" />
@@ -139,10 +139,9 @@ function BirthDayListPageContent() {
             ) : (
               <div className="space-y-2">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-6 mb-4">
-                  {filteredBirthdays.map((birthday, index) => (
-                    <div key={index}>
+                  {filteredBirthdays.map((birthday) => (
+                    <div key={birthday.id}>
                       <BirthdayCard
-                        key={index}
                         name={birthday.name}
                         birthdayDate={birthday.date}
                         daysToBirthDay={birthday.daysToBirthday}
@@ -153,7 +152,6 @@ function BirthDayListPageContent() {
                       />
                     </div>
                   ))}
-
                   <BirthdayDetailsForm
                     initialData={selectedBirthday}
                     onBirthdayDataUpdated={updateBirthday}

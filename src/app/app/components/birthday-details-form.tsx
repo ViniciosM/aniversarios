@@ -12,7 +12,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
   PopoverContent,
@@ -33,6 +32,7 @@ import {
 import { AppServerError } from "@/app/domain/erros";
 
 import { ptBR } from "date-fns/locale";
+import { CalendarCustom } from "@/components/ui/calendar-custom";
 type FormBirthdayData = {
   id?: number;
   name: string;
@@ -241,9 +241,12 @@ export function BirthdayDetailsForm({
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
+                    <CalendarCustom
                       mode="single"
+                      captionLayout="dropdown-buttons"
                       locale={ptBR}
+                      fromYear={1924}
+                      toYear={today.getFullYear()}
                       disabled={isDateDisabled}
                       selected={field.value}
                       onSelect={(newDate) => {

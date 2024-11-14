@@ -1,14 +1,14 @@
-export interface RecommendadedGifts {
+export interface RecommendadedGift {
     id: number;
     name: string;
     description: string;
 }
 export interface Birthday {
-    id: number;
+    id?: number;
     name: string;
     date: Date;
     relationship: string;
     observation?: string;
     daysToBirthday: number;
-    recommendadedGifts?: RecommendadedGifts;
+    recommendadedGifts?: RecommendadedGift[];
 }
