@@ -7,6 +7,7 @@ type BirthdayContextType = {
   birthdays: Birthday[];
   setBirthdays: React.Dispatch<React.SetStateAction<Birthday[]>>;
   addBirthday: (newBirthday: Birthday) => void;
+  setBirthdaysList: (birthdays: Birthday[]) => void;
   updateBirthday: (newBirthday: Birthday) => void;
   removeBirthday: (birthdayId: number) => void;
 };
@@ -30,21 +31,21 @@ export const BirthdayProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [birthdays, setBirthdays] = useState<Birthday[]>([]);
 
+  const setBirthdaysList = useCallback((birthdays: Birthday[]) => {
+    setBirthdays(birthdays.sort((a, b) => a.daysToBirthday - b.daysToBirthday));
+  }, []);
+
   const addBirthday = useCallback((newBirthday: Birthday) => {
     setBirthdays((prevBirthdays) => {
-      return [...prevBirthdays, newBirthday].sort(
-        (a, b) => a.daysToBirthday - b.daysToBirthday
-      );
+      return [...prevBirthdays, newBirthday];
     });
   }, []);
 
   const updateBirthday = useCallback((newBirthday: Birthday) => {
     setBirthdays((prevBirthdays) =>
-      prevBirthdays
-        .map((birthday) =>
-          birthday.id === newBirthday.id ? newBirthday : birthday
-        )
-        .sort((a, b) => a.daysToBirthday - b.daysToBirthday)
+      prevBirthdays.map((birthday) =>
+        birthday.id === newBirthday.id ? newBirthday : birthday
+      )
     );
   }, []);
 
@@ -59,6 +60,7 @@ export const BirthdayProvider: React.FC<{ children: React.ReactNode }> = ({
       value={{
         birthdays,
         setBirthdays,
+        setBirthdaysList,
         addBirthday,
         removeBirthday,
         updateBirthday,
