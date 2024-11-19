@@ -1,5 +1,5 @@
 //import { getServerSession } from "next-auth";
-import { handlers } from "@/lib/auth";
+import { handlers } from "../../../../../auth";
 //import { NEXT_AUTH } from "@/lib/auth";
 
 export const { GET, POST } = handlers

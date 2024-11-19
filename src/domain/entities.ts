@@ -11,4 +11,5 @@ export interface Birthday {
     observation?: string;
     daysToBirthday: number;
     recommendadedGifts?: RecommendadedGift[];
+    user_id: string;
 }

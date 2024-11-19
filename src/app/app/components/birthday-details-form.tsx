@@ -23,22 +23,22 @@ import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Icons } from "@/components/ui/icons";
-import { toast } from "@/hooks/use-toast";
-import { Birthday } from "@/app/domain/entities";
-import {
-  BirthdayService,
-  UpdateBirthdayData,
-} from "../service/birthday-service";
-import { AppServerError } from "@/app/domain/erros";
-
 import { ptBR } from "date-fns/locale";
 import { CalendarCustom } from "@/components/ui/calendar-custom";
+import { useBirthdayContext } from "../contexts/birthday-page-context";
+import { useSession } from "next-auth/react";
+import {
+  createUpdatedBirthdayData,
+  parseToUpdateBirthdayData,
+} from "../service/models/update-birthday-dto";
+
 type FormBirthdayData = {
   id?: number;
   name: string;
   relationship: string;
   observation?: string;
   date: Date;
+  user_id: string;
 };
 
 const schema = yup.object({
@@ -46,13 +46,12 @@ const schema = yup.object({
   relationship: yup.string().required("Relacionamento é obrigatório"),
   observation: yup.string().optional(),
   date: yup.date().required("Data é obrigatória"),
+  user_id: yup.string().required("Usuário é obrigatório"),
 });
 
 interface BirthdayFormDialogProps {
   children?: React.ReactNode;
   initialData?: FormBirthdayData;
-  onBirthdayDataCreated?: (data: Birthday) => void;
-  onBirthdayDataUpdated?: (data: Birthday) => void;
   isOpen: boolean;
   onOpenChange?: (open: boolean) => void;
 }
@@ -60,13 +59,15 @@ interface BirthdayFormDialogProps {
 export function BirthdayDetailsForm({
   children,
   initialData,
-  onBirthdayDataCreated,
-  onBirthdayDataUpdated,
   isOpen,
   onOpenChange,
 }: BirthdayFormDialogProps) {
   const [isCalendarOpen, setIsCalendarOpen] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
+
+  const { createBirthday, changeBirthday } = useBirthdayContext();
+
+  const session = useSession();
 
   const {
     control,
@@ -81,6 +82,7 @@ export function BirthdayDetailsForm({
       relationship: "",
       observation: "",
       date: undefined,
+      user_id: session.data!.user.id,
     },
   });
 
@@ -88,78 +90,29 @@ export function BirthdayDetailsForm({
     setIsLoading(true);
 
     if (initialData !== undefined && initialData.id) {
-      await changeBirthday(data);
+      await updateBirthday(data);
     } else {
-      await createBirthday(data);
+      await createBirthday({ ...data, date: data.date.toISOString() }, () => {
+        onOpenChange?.(false);
+      });
     }
-
     setIsLoading(false);
   };
 
-  const changeBirthday = async (data: FormBirthdayData) => {
-    const updateData = await createUpdatedBirthdayData(data);
+  const updateBirthday = async (data: FormBirthdayData) => {
+    const updateData = await createUpdatedBirthdayData(
+      parseToUpdateBirthdayData({ ...data, id: data.id! }),
+      initialData
+        ? parseToUpdateBirthdayData({ ...initialData, id: initialData.id! })
+        : undefined
+    );
     if (updateData === undefined) {
       onOpenChange?.(false);
       return;
     }
-    const result = await BirthdayService.update(updateData);
-    if (result instanceof AppServerError) {
-      toast({
-        variant: "destructive",
-        title: "Ocorreu um erro",
-        description: "Não foi possível atualizar o aniversário.",
-        duration: 3000,
-      });
-    } else {
+    changeBirthday(updateData, () => {
       onOpenChange?.(false);
-      onBirthdayDataUpdated?.(result);
-    }
-  };
-
-  const createUpdatedBirthdayData = async (data: FormBirthdayData) => {
-    if (data.id === undefined) return;
-    const updateData: UpdateBirthdayData = { id: data.id! };
-
-    if (data.name !== initialData?.name) {
-      updateData.name = data.name;
-    }
-
-    if (data.date.toISOString() !== initialData?.date.toISOString()) {
-      updateData.date = data.date.toISOString();
-    }
-
-    if (data.relationship !== initialData?.relationship) {
-      updateData.relationship = data.relationship;
-    }
-
-    if (data.observation !== initialData?.observation) {
-      updateData.observation = data.observation;
-    }
-
-    return updateData;
-  };
-
-  const createBirthday = async (data: FormBirthdayData) => {
-    const result = await BirthdayService.create({
-      name: data.name,
-      relationship: data.relationship,
-      observation: data.observation,
-      date: data.date.toISOString(),
-      user_id: "efe5ffea-3c3a-4168-8853-ccac1191125d",
     });
-    if (result instanceof AppServerError) {
-      toast({
-        variant: "destructive",
-        title: "Ocorreu um erro",
-        description: "Não foi possível criar o aniversário.",
-        duration: 3000,
-      });
-      return;
-    } else {
-      onOpenChange?.(false);
-      onBirthdayDataCreated?.(result);
-      return;
-    }
   };
 
   const today = todayDate();

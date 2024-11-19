@@ -1,29 +1,20 @@
-import { Birthday } from './../../domain/entities';
-import { AppServerError } from "@/app/domain/erros";
-import { supabase } from "@/lib/supabase";
+import { Birthday } from '../../../domain/entities';
+import { AppServerError } from "@/domain/erros";
 import { calculateDaysUntilBirthday, todayDate } from '@/lib/utils';
+import { SupabaseClient } from '@supabase/supabase-js';
 import { parseISO } from "date-fns";
+import { CreateBirthdayData } from './models/create-bithday-dto';
+import { UpdateBirthdayData } from './models/update-birthday-dto';
 
-export type UpdateBirthdayData = {
-    id: number;
-    name?: string;
-    date?: string;
-    relationship?: string;
-    observation?: string;
-};
 
-export type CreateBirthdayData = {
-    name: string,
-    date: string,
-    relationship: string,
-    observation?: string,
-    user_id: string,
-}
-
-export abstract class BirthdayService {
-    static async fetchBirthdays(userId: string): Promise<Birthday[] | AppServerError> {
+export class BirthdayService {
+    supabase: SupabaseClient;
+    constructor(supabase: SupabaseClient) {
+        this.supabase = supabase;
+    }
+    async fetchBirthdays(userId: string): Promise<Birthday[] | AppServerError> {
         try {
-            const { data, error } = await supabase
+            const { data, error } = await this.supabase
                 .from('birthdays')
                 .select(`
                         id,
@@ -45,11 +36,11 @@ export abstract class BirthdayService {
             }
 
             const today = todayDate();
-            
-            const parsedBirthdays = (data).map(birthday => {
+
+            const parsedBirthdays = (data).map((birthday) => {
                 birthday.date = parseISO(birthday.date as string);
-                const daysToBirthday = calculateDaysUntilBirthday( birthday.date, today)
-                return { ...birthday, daysToBirthday};
+                const daysToBirthday = calculateDaysUntilBirthday(birthday.date, today)
+                return { ...birthday, daysToBirthday, user_id: userId };
             });
             return parsedBirthdays;
         } catch (err) {
@@ -57,9 +48,9 @@ export abstract class BirthdayService {
         }
     }
 
-    static async create(birthday: CreateBirthdayData): Promise<Birthday | AppServerError> {
+    async create(birthday: CreateBirthdayData): Promise<Birthday | AppServerError> {
         try {
-            const { data, error } = await supabase
+            const { data, error } = await this.supabase
                 .from('birthdays')
                 .insert([
                     birthday,
@@ -69,12 +60,12 @@ export abstract class BirthdayService {
             if (error) {
                 return new AppServerError(error.message, 400);
             }
-             const today = todayDate();
+            const today = todayDate();
 
-            const parsedBirthdays = (data).map(birthday => {
+            const parsedBirthdays = (data).map((birthday) => {
                 birthday.date = parseISO(birthday.date as string);
-                const daysToBirthday = calculateDaysUntilBirthday( birthday.date, today)
-                return { ...birthday, daysToBirthday};
+                const daysToBirthday = calculateDaysUntilBirthday(birthday.date, today)
+                return { ...birthday, daysToBirthday };
             });
 
             return parsedBirthdays.at(0)!;
@@ -84,9 +75,9 @@ export abstract class BirthdayService {
     }
 
 
-    static async update(birthday: UpdateBirthdayData): Promise<Birthday | AppServerError> {
+    async update(birthday: UpdateBirthdayData): Promise<Birthday | AppServerError> {
         try {
-            const { data, error } = await supabase
+            const { data, error } = await this.supabase
                 .from('birthdays')
                 .update(birthday)
                 .eq('id', birthday.id)
@@ -96,10 +87,10 @@ export abstract class BirthdayService {
                 return new AppServerError(error.message, 400);
             }
             const today = todayDate();
-            const parsedBirthdays = (data).map(birthday => {
+            const parsedBirthdays = (data).map((birthday) => {
                 birthday.date = parseISO(birthday.date as string);
-                const daysToBirthday = calculateDaysUntilBirthday( birthday.date, today)
-                return { ...birthday, daysToBirthday};
+                const daysToBirthday = calculateDaysUntilBirthday(birthday.date, today)
+                return { ...birthday, daysToBirthday };
             });
 
             return parsedBirthdays.at(0)!;
@@ -108,9 +99,9 @@ export abstract class BirthdayService {
         }
     }
 
-    static async delete(birthdayId: number): Promise<number | AppServerError> {
+    async delete(birthdayId: number): Promise<number | AppServerError> {
         try {
-            const { error } = await supabase
+            const { error } = await this.supabase
                 .from('birthdays')
                 .delete()
                 .eq('id', birthdayId)
