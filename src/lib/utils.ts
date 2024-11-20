@@ -1,12 +1,12 @@
-import { clsx, type ClassValue } from "clsx"
+import { type ClassValue, clsx } from "clsx";
 import { parseISO } from "date-fns";
-import { twMerge } from "tailwind-merge"
+import { twMerge } from "tailwind-merge";
 import { toast } from "./hooks/use-toast";
+import { APP_WEB_PUBLIC_URL } from "./const";
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
-
 
 export const minimumDate = parseISO("1900-01-01");
 
@@ -14,9 +14,12 @@ export const todayDate = () => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   return today;
-}
+};
 
-export const calculateDaysUntilBirthday = (birthdayDate: Date, todayDate: Date) => {
+export const calculateDaysUntilBirthday = (
+  birthdayDate: Date,
+  todayDate: Date,
+) => {
   const birthday = new Date(birthdayDate);
   birthday.setFullYear(todayDate.getFullYear());
 
@@ -29,8 +32,6 @@ export const calculateDaysUntilBirthday = (birthdayDate: Date, todayDate: Date) 
   return days;
 };
 
-
-
 export const defaultToastUnexpectedError = (description?: string | null) => {
   toast({
     variant: "destructive",
@@ -38,4 +39,12 @@ export const defaultToastUnexpectedError = (description?: string | null) => {
     description: description ?? "Não foi possível concluir a operação",
     duration: 3000,
   });
+};
+
+export function baseUrlNormalized(path?: string) {
+  const baseUrl = APP_WEB_PUBLIC_URL || "";
+  const normalizedPath = path && !path.startsWith("/")
+    ? `/${path}`
+    : path || "";
+  return `${baseUrl}${normalizedPath}`;
 }

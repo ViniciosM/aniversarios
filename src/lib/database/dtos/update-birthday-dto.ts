@@ -1,15 +1,14 @@
 export interface UpdateBirthdayData {
     id: number;
     name?: string;
-    date?: string;
+    date?: string | Date;
     relationship?: string;
     observation?: string;
-};
-
+}
 
 export const createUpdatedBirthdayData = async (
     data: UpdateBirthdayData,
-    initialData?: UpdateBirthdayData
+    initialData?: UpdateBirthdayData,
 ) => {
     const updateData: UpdateBirthdayData = { id: data.id };
 
@@ -32,8 +31,9 @@ export const createUpdatedBirthdayData = async (
     return updateData;
 };
 
-
-export const parseToUpdateBirthdayData = (data: { id: number; name?: string; date?: Date | string; relationship?: string; observation?: string; },): UpdateBirthdayData => {
+export const parseToUpdateBirthdayData = (
+    data: UpdateBirthdayData,
+): UpdateBirthdayData => {
     const parsedData: UpdateBirthdayData = { id: data.id };
 
     if (data.name) {
@@ -41,7 +41,9 @@ export const parseToUpdateBirthdayData = (data: { id: number; name?: string; dat
     }
 
     if (data.date) {
-        parsedData.date = data.date instanceof Date ? data.date.toISOString() : data.date;
+        parsedData.date = data.date instanceof Date
+            ? data.date.toISOString()
+            : data.date;
     }
 
     if (data.relationship) {

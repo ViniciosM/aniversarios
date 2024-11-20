@@ -8,7 +8,7 @@ export interface Birthday {
     name: string;
     date: Date;
     relationship: string;
-    observation?: string;
+    observation?: string | null;
     daysToBirthday: number;
     recommendadedGifts?: RecommendadedGift[];
     user_id: string;

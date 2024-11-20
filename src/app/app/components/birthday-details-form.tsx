@@ -30,7 +30,7 @@ import { useSession } from "next-auth/react";
 import {
   createUpdatedBirthdayData,
   parseToUpdateBirthdayData,
-} from "../service/models/update-birthday-dto";
+} from "../../../lib/database/dtos/update-birthday-dto";
 
 type FormBirthdayData = {
   id?: number;
@@ -92,7 +92,7 @@ export function BirthdayDetailsForm({
     if (initialData !== undefined && initialData.id) {
       await updateBirthday(data);
     } else {
-      await createBirthday({ ...data, date: data.date.toISOString() }, () => {
+      await createBirthday({ ...data, daysToBirthday: 0 }, () => {
         onOpenChange?.(false);
       });
     }

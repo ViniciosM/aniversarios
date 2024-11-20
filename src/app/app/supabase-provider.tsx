@@ -1,42 +1,37 @@
 "use client";
 import { createContext, useContext, useMemo } from "react";
-import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { useSession } from "next-auth/react";
+import { Database } from "@/lib/database/database";
+import { AppConfig } from "@/lib/app.config";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "";
+const DatabaseContext = createContext<Database | null>(null);
 
-const SupabaseContext = createContext<SupabaseClient | null>(null);
-
-export const SupabaseProvider = ({
+export const DatabaseProvider = ({
   children,
 }: {
   children: React.ReactNode;
 }) => {
   const { data: session } = useSession();
 
-  const supabase = useMemo(() => {
-    console.log("criando memo supabase");
-    return createClient(supabaseUrl, supabaseAnonKey, {
-      global: {
-        headers: {
-          Authorization: `Bearer ${session?.supabaseAccessToken}`,
-        },
-      },
+  const database = useMemo(() => {
+    const db = new AppConfig.database();
+    db.connect({
+      customAccessToken: session?.supabaseAccessToken ?? "",
     });
+    return db;
   }, [session]);
 
   return (
-    <SupabaseContext.Provider value={supabase}>
+    <DatabaseContext.Provider value={database}>
       {children}
-    </SupabaseContext.Provider>
+    </DatabaseContext.Provider>
   );
 };
 
-export const useSupabase = (): SupabaseClient => {
-  const context = useContext(SupabaseContext);
+export const useDatabase = (): Database => {
+  const context = useContext(DatabaseContext);
   if (!context) {
-    throw new Error("useSupabase must be used within a SupabaseProvider");
+    throw new Error("useDatabase must be used within a DatabaseProvider");
   }
   return context;
 };

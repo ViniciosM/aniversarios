@@ -4,12 +4,9 @@ import {} from "@/components/ui/collapsible";
 import { BirthdayDetailsForm } from "../app/app/components/birthday-details-form";
 import { SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
 import { Home, Plus } from "lucide-react";
-import { useBirthdayContext } from "@/app/app/contexts/birthday-page-context";
 import { useState } from "react";
 
 export function NavMain() {
-  const { addBirthday } = useBirthdayContext();
-
   const [isBirthdayFormOpen, setIsBirthdayFormOpen] = useState(false);
   return (
     <>
@@ -23,7 +20,6 @@ export function NavMain() {
       </SidebarMenuItem>
       <SidebarMenuItem>
         <BirthdayDetailsForm
-          onBirthdayDataCreated={(data) => addBirthday(data)}
           isOpen={isBirthdayFormOpen}
           onOpenChange={setIsBirthdayFormOpen}
         >

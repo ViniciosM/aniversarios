@@ -2,7 +2,7 @@ import { BirthdayCard } from "@/components/birthday-card";
 import { BirthdayDetailsForm } from "./birthday-details-form";
 import { useBirthdayContext } from "../contexts/birthday-page-context";
 import { useCallback, useMemo, useState } from "react";
-import { Birthday } from "@/domain/entities";
+import { Birthday } from "@/lib/domain/entities";
 import FilterButtons from "./birthday-filter-buttons";
 
 export default function BirthdayList() {

@@ -1,7 +1,7 @@
 import { Toaster } from "@/components/ui/toaster";
-import { SupabaseProvider } from "./supabase-provider";
 import { SessionProvider } from "next-auth/react";
-import { auth } from "../../../auth";
+import { auth } from "../../lib/auth";
+import { DatabaseProvider } from "./supabase-provider";
 
 export default async function RootLayout({
   children,
@@ -21,8 +21,8 @@ export default async function RootLayout({
 
   return (
     <>
-      <SessionProvider session={session}>
-        <SupabaseProvider>{children}</SupabaseProvider>
+      <SessionProvider refetchOnWindowFocus={false} session={session}>
+        <DatabaseProvider>{children}</DatabaseProvider>
       </SessionProvider>
       <Toaster />
     </>

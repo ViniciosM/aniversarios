@@ -1,20 +1,12 @@
 "use client";
 
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useCallback,
-  useMemo,
-} from "react";
-import { Birthday } from "@/domain/entities";
-import { BirthdayService } from "../service/birthday-service";
-import { useSupabase } from "@/app/app/supabase-provider";
-import { AppError, AppServerError } from "@/domain/erros";
+import React, { createContext, useContext, useState, useCallback } from "react";
+import { Birthday } from "@/lib/domain/entities";
+import { useDatabase } from "@/app/app/supabase-provider";
+import { AppError, AppServerError } from "@/lib/domain/erros";
 import { useToast } from "@/lib/hooks/use-toast";
 import { defaultToastUnexpectedError } from "@/lib/utils";
-import { CreateBirthdayData } from "../service/models/create-bithday-dto";
-import { UpdateBirthdayData } from "../service/models/update-birthday-dto";
+import { UpdateBirthdayData } from "../../../lib/database/dtos/update-birthday-dto";
 
 type BirthdayContextType = {
   birthdays: Birthday[];
@@ -23,10 +15,7 @@ type BirthdayContextType = {
   setBirthdaysList: (birthdays: Birthday[]) => void;
   updateBirthday: (newBirthday: Birthday) => void;
   removeBirthday: (birthdayId: number) => void;
-  createBirthday: (
-    birthday: CreateBirthdayData,
-    onSucess: () => void
-  ) => Promise<void>;
+  createBirthday: (birthday: Birthday, onSucess: () => void) => Promise<void>;
   changeBirthday: (
     birthday: UpdateBirthdayData,
     onSucess: () => void
@@ -60,7 +49,7 @@ export const BirthdayProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [birthdays, setBirthdays] = useState<Birthday[]>([]);
 
-  const supabase = useSupabase();
+  const database = useDatabase();
 
   const { toast } = useToast();
 
@@ -88,23 +77,9 @@ export const BirthdayProvider: React.FC<{ children: React.ReactNode }> = ({
     );
   }, []);
 
-  const birthdayService = useMemo(() => {
-    console.log("suapabse criando");
-    return new BirthdayService(supabase);
-  }, [supabase]);
-
-  const createBirthday = async (
-    birthday: CreateBirthdayData,
-    onSucess: () => void
-  ) => {
+  const createBirthday = async (birthday: Birthday, onSucess: () => void) => {
     try {
-      const result = await birthdayService.create({
-        name: birthday.name,
-        relationship: birthday.relationship,
-        observation: birthday.observation,
-        date: birthday.date,
-        user_id: birthday.user_id,
-      });
+      const result = await database.createBirthday(birthday);
       if (result instanceof AppServerError) {
         toast({
           variant: "destructive",
@@ -128,7 +103,7 @@ export const BirthdayProvider: React.FC<{ children: React.ReactNode }> = ({
     onSucess: () => void
   ) => {
     try {
-      const result = await birthdayService.update(birthday);
+      const result = await database.updateBirthday(birthday);
       if (result instanceof AppServerError) {
         toast({
           variant: "destructive",
@@ -150,7 +125,7 @@ export const BirthdayProvider: React.FC<{ children: React.ReactNode }> = ({
   const fetchBirthdays = useCallback(
     async (user_id: string, onError: (err: AppError) => void) => {
       try {
-        const result = await birthdayService.fetchBirthdays(user_id);
+        const result = await database.fetchBirthdays(user_id);
         if (result instanceof AppServerError) {
           onError(result);
           toast({
@@ -169,7 +144,7 @@ export const BirthdayProvider: React.FC<{ children: React.ReactNode }> = ({
         defaultToastUnexpectedError();
       }
     },
-    [birthdayService, setBirthdaysList, toast]
+    [setBirthdaysList, toast, database]
   );
 
   const deleteBirthday = async (
@@ -177,7 +152,7 @@ export const BirthdayProvider: React.FC<{ children: React.ReactNode }> = ({
     onError?: (err: AppError) => void
   ) => {
     try {
-      const result = await birthdayService.delete(birthday_id);
+      const result = await database.deleteBirthday(birthday_id);
       if (result instanceof AppServerError) {
         onError?.(result);
         toast({

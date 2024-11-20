@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import BirthdayCardSkeletonLoading from "./birthday-card-skeleton-loading";
 import { useCallback, useEffect, useState } from "react";
@@ -9,6 +11,7 @@ export function BirthdayContent() {
   const [error, setError] = useState<Error | null>(null);
   const { fetchBirthdays } = useBirthdayContext();
   const { data } = useSession();
+
   const loadBirthdays = useCallback(async () => {
     setIsLoading(true);
     setError(null);
@@ -20,7 +23,8 @@ export function BirthdayContent() {
 
   useEffect(() => {
     loadBirthdays();
-  }, [loadBirthdays]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (isLoading) {
     return <BirthdayCardSkeletonLoading />;
