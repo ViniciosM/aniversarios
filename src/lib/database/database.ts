@@ -18,4 +18,8 @@ export interface Database {
     ): Promise<Birthday | AppServerError>;
 
     deleteBirthday(birthdayId: number): Promise<number | AppServerError>;
+
+    recommendGifts(
+        birthday: Birthday,
+    ): Promise<Birthday | AppServerError>;
 }

@@ -8,6 +8,7 @@ import {
     createBirthday,
     deleteBirthday,
     fetchBirthdays,
+    recommendGifts,
     updateBirthday,
 } from "./actions/birthdays";
 import { UpdateBirthdayData } from "../dtos/update-birthday-dto";
@@ -57,5 +58,11 @@ export class SupaClientDatabase implements Database {
     }
     async deleteBirthday(birthdayId: number): Promise<number | AppServerError> {
         return await deleteBirthday(this.supabase!, birthdayId);
+    }
+
+    async recommendGifts(
+        birthday: Birthday,
+    ): Promise<Birthday | AppServerError> {
+        return await recommendGifts(this.supabase!, birthday);
     }
 }

@@ -1,7 +1,7 @@
 import { Toaster } from "@/components/ui/toaster";
 import { SessionProvider } from "next-auth/react";
 import { auth } from "../../lib/auth";
-import { DatabaseProvider } from "./supabase-provider";
+import { DatabaseProvider } from "./database-provider";
 
 export default async function RootLayout({
   children,

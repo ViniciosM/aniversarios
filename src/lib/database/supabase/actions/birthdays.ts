@@ -1,7 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Birthday } from "@/lib/domain/entities";
 import { AppServerError } from "@/lib/domain/erros";
-import { calculateDaysUntilBirthday, todayDate } from "@/lib/utils";
+import {
+    calculateAge,
+    calculateDaysUntilBirthday,
+    todayDate,
+} from "@/lib/utils";
 import { SupabaseClient } from "@supabase/supabase-js";
 import { parseISO } from "date-fns";
 import { SupabaseSchema } from "../supabase-schema";
@@ -117,6 +121,39 @@ export const deleteBirthday = async (
         return new AppServerError("Failed to delete birthday", 400);
     }
 };
+export const recommendGifts = async (
+    supabase: SupabaseClient<SupabaseSchema>,
+    birthday: Birthday,
+): Promise<Birthday | AppServerError> => {
+    try {
+        const age = calculateAge(birthday.date);
+        const { data, error } = await supabase.functions.invoke(
+            "recommend-gifts",
+            {
+                method: "POST",
+                body: {
+                    relationship: birthday.relationship,
+                    age: age,
+                    characteristics: birthday.observation ?? undefined,
+                    birthday_id: birthday.id,
+                },
+            },
+        );
+
+        if (error) {
+            console.error(error);
+            return new AppServerError(error.message, 400);
+        }
+
+        return {
+            ...birthday,
+            recommendadedGifts: data,
+        };
+    } catch (err) {
+        console.error(err);
+        return new AppServerError("Failed to delete birthday", 400);
+    }
+};
 
 const parseBirthday = (
     data: SupabaseSchema["public"]["Tables"]["birthdays"]["Row"],
@@ -127,7 +164,7 @@ const parseBirthday = (
         name: data.name,
         date: parsedDate,
         relationship: data.relationship,
-        observation: data.observation,
+        observation: data.observation ?? undefined,
         user_id: data.user_id,
         daysToBirthday: calculateDaysUntilBirthday(
             parsedDate,
@@ -137,6 +174,7 @@ const parseBirthday = (
 
     return result;
 };
+
 const parseBirthdays = (
     data: {
         id: any;
@@ -164,6 +202,11 @@ const parseBirthdays = (
             parsedDate,
             todayDate(),
         ),
+        recommendadedGifts: data.recommended_gifts.map((gift) => ({
+            id: gift.id,
+            name: gift.name,
+            description: gift.description,
+        })),
     };
 
     return result;

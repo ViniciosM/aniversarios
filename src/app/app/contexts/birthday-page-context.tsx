@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useCallback } from "react";
 import { Birthday } from "@/lib/domain/entities";
-import { useDatabase } from "@/app/app/supabase-provider";
+import { useDatabase } from "@/app/app/database-provider";
 import { AppError, AppServerError } from "@/lib/domain/erros";
 import { useToast } from "@/lib/hooks/use-toast";
 import { defaultToastUnexpectedError } from "@/lib/utils";
@@ -27,6 +27,10 @@ type BirthdayContextType = {
   deleteBirthday: (
     birthday_id: number,
     onError?: (err: AppError) => void
+  ) => Promise<void>;
+  recommendGifts: (
+    birthday: Birthday,
+    onSucess: (birthday: Birthday) => void
   ) => Promise<void>;
 };
 
@@ -53,27 +57,39 @@ export const BirthdayProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const { toast } = useToast();
 
+  const sortBirthdays = (birthdays: Birthday[]) =>
+    birthdays.sort((a, b) => a.daysToBirthday - b.daysToBirthday);
+
   const setBirthdaysList = useCallback((birthdays: Birthday[]) => {
-    setBirthdays(birthdays.sort((a, b) => a.daysToBirthday - b.daysToBirthday));
+    setBirthdays(sortBirthdays([...birthdays]));
   }, []);
 
   const addBirthday = useCallback((newBirthday: Birthday) => {
-    setBirthdays((prevBirthdays) => {
-      return [...prevBirthdays, newBirthday];
-    });
+    setBirthdays((prevBirthdays) =>
+      sortBirthdays([...prevBirthdays, newBirthday])
+    );
   }, []);
 
   const updateBirthday = useCallback((newBirthday: Birthday) => {
     setBirthdays((prevBirthdays) =>
-      prevBirthdays.map((birthday) =>
-        birthday.id === newBirthday.id ? newBirthday : birthday
+      sortBirthdays(
+        prevBirthdays.map((birthday) =>
+          birthday.id === newBirthday.id
+            ? {
+                ...newBirthday,
+                recommendadedGifts: birthday.recommendadedGifts,
+              }
+            : birthday
+        )
       )
     );
   }, []);
 
   const removeBirthday = useCallback((birthdayId: number) => {
     setBirthdays((prevBirthdays) =>
-      prevBirthdays.filter((birthday) => birthday.id !== birthdayId)
+      sortBirthdays(
+        prevBirthdays.filter((birthday) => birthday.id !== birthdayId)
+      )
     );
   }, []);
 
@@ -172,6 +188,30 @@ export const BirthdayProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  const recommendGifts = async (
+    birthday: Birthday,
+    onSucess: (birthday: Birthday) => void
+  ) => {
+    try {
+      const result = await database.recommendGifts(birthday);
+      if (result instanceof AppServerError) {
+        toast({
+          variant: "destructive",
+          title: "Ocorreu um erro",
+          description: "Não foi possível recomendar o aniversário.",
+          duration: 3000,
+        });
+        return;
+      } else {
+        updateBirthday(result);
+        onSucess(result);
+        return;
+      }
+    } catch (err) {
+      defaultToastUnexpectedError();
+    }
+  };
+
   return (
     <BirthdayContext.Provider
       value={{
@@ -185,6 +225,7 @@ export const BirthdayProvider: React.FC<{ children: React.ReactNode }> = ({
         changeBirthday,
         fetchBirthdays,
         deleteBirthday,
+        recommendGifts,
       }}
     >
       {children}
