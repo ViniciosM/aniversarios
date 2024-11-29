@@ -1,0 +1,10 @@
+{
+	"Insert OR Operator": {
+		"scope": "",
+		"prefix": "ou",
+		"body": [
+			"||"
+		],
+		"description": "Insere o operador lógico OU (||)"
+	}
+}
