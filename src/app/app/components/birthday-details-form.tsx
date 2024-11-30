@@ -199,7 +199,7 @@ export function BirthdayDetailsForm({
                       captionLayout="dropdown-buttons"
                       locale={ptBR}
                       fromYear={1924}
-                      toYear={today.getFullYear()}
+                      toYear={2000}
                       disabled={isDateDisabled}
                       selected={field.value}
                       onSelect={(newDate) => {
