@@ -61,6 +61,10 @@ export default function BirthdayList() {
           <PlusCircle className="mr-2 h-4 w-4" />
           Adicionar Aniversário
         </Button>
+        <BirthdayDetailsForm
+          isOpen={isBirthdayFormOpen}
+          onOpenChange={setIsBirthdayFormOpen}
+        />
       </div>
     );
   }
