@@ -2,7 +2,12 @@ import { Toaster } from "@/components/ui/toaster";
 import { SessionProvider } from "next-auth/react";
 import { auth } from "../../lib/auth";
 import { DatabaseProvider } from "./database-provider";
+import { Metadata } from "next";
 
+export const metadata: Metadata = {
+  title: "Aniversários",
+  description: "Gerencie seus aniversários",
+};
 export default async function RootLayout({
   children,
 }: Readonly<{

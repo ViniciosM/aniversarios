@@ -11,7 +11,7 @@ export function NavMain() {
   return (
     <>
       <SidebarMenuItem>
-        <SidebarMenuButton asChild isActive={true}>
+        <SidebarMenuButton asChild>
           <a href="#">
             <Home className="mr-2 h-4 w-4" />
             Início

@@ -37,6 +37,14 @@ body {
   --input: 21 30% 50%;
   --ring: 21 100% 50%;
   --radius: 0.5rem;
+  --sidebar-background: 21 100% 95%;
+  --sidebar-foreground: 21 5% 10%;
+  --sidebar-primary: 21 100% 50%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: -17 30% 90%;
+  --sidebar-accent-foreground: 21 5% 15%;
+  --sidebar-border: 21 30% 82%;
+  --sidebar-ring: 21 100% 50%;
 }
 .dark {
   --background: 20.5 10% 6%;
@@ -59,6 +67,14 @@ body {
   --input: 20.5 20% 18%;
   --ring: 20.5 90.2% 48.2%;
   --radius: 0.5rem;
+  --sidebar-background: 20.5 10% 6%;
+  --sidebar-foreground: 20.5 0% 90%;
+  --sidebar-primary: 20.5 90.2% 48.2%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: -17.5 10% 15%;
+  --sidebar-accent-foreground: 20.5 0% 90%;
+  --sidebar-border: 20.5 20% 18%;
+  --sidebar-ring: 20.5 90.2% 48.2%;
 }
 
 @layer base {

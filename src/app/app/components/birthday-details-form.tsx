@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -31,6 +32,7 @@ import {
   createUpdatedBirthdayData,
   parseToUpdateBirthdayData,
 } from "../../../lib/database/dtos/update-birthday-dto";
+import { useMemo } from "react";
 
 type FormBirthdayData = {
   id?: number;
@@ -68,6 +70,10 @@ export function BirthdayDetailsForm({
   const { createBirthday, changeBirthday } = useBirthdayContext();
 
   const session = useSession();
+
+  const defaultMonth = useMemo(() => {
+    return initialData?.date || new Date(2000, 0);
+  }, [initialData?.date]);
 
   const {
     control,
@@ -131,6 +137,7 @@ export function BirthdayDetailsForm({
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="rounded-lg w-[90%] sm:max-w-[425px]">
+        <DialogDescription className="hidden"></DialogDescription>
         <DialogHeader>
           <DialogTitle>
             {initialData ? "Atualizar Aniversário" : "Novo Aniversário"}
@@ -198,8 +205,9 @@ export function BirthdayDetailsForm({
                       mode="single"
                       captionLayout="dropdown-buttons"
                       locale={ptBR}
+                      defaultMonth={defaultMonth}
                       fromYear={1924}
-                      toYear={2000}
+                      toYear={today.getFullYear()}
                       disabled={isDateDisabled}
                       selected={field.value}
                       onSelect={(newDate) => {
