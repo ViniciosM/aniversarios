@@ -77,7 +77,8 @@ export const BirthdayProvider: React.FC<{ children: React.ReactNode }> = ({
           birthday.id === newBirthday.id
             ? {
                 ...newBirthday,
-                recommendadedGifts: birthday.recommendadedGifts,
+                recommendadedGifts:
+                  newBirthday.recommendadedGifts ?? birthday.recommendadedGifts,
               }
             : birthday
         )
@@ -203,6 +204,7 @@ export const BirthdayProvider: React.FC<{ children: React.ReactNode }> = ({
         });
         return;
       } else {
+        console.log(result);
         updateBirthday(result);
         onSucess(result);
         return;
